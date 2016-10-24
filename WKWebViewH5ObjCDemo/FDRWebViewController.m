@@ -112,6 +112,12 @@ static NSString *const kImage                 = @"keyForImage";
     // 注入JS对象名称AppModel，当JS通过AppModel来调用时，
     // 我们可以在WKScriptMessageHandler代理中接收到
     [config.userContentController addScriptMessageHandler:self name:@"login"];
+    
+    //h5文档开始加载时执行：  设置token
+    WKUserScript * tokenScript = [[WKUserScript alloc]
+                                  initWithSource: @"document.cookie = 'token=TeskCookieValue1';"
+                                  injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:NO];
+    [config.userContentController addUserScript:tokenScript];
 
     // 显示WKWebView
     WKWebView *wkWebView = [[WKWebView alloc] initWithFrame:self.view.bounds configuration:config];
@@ -132,6 +138,8 @@ static NSString *const kImage                 = @"keyForImage";
     //    [wkWebView loadRequest:request];
     
      self.wkWebView = wkWebView;
+    
+    
     
     NSURL *path = [[NSBundle mainBundle] URLForResource:@"test" withExtension:@"html"];
     [self.wkWebView loadRequest:[NSURLRequest requestWithURL:path]];
