@@ -80,6 +80,8 @@ static NSString *const kImage                 = @"keyForImage";
 //    longPressed.delegate = self;
 //    longPressed.minimumPressDuration = 0.8;
 //    [self.wkWebView addGestureRecognizer:longPressed];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadData) name:@"reloadJSData" object:nil];
 }
 
 - (void)configUI {
@@ -114,9 +116,14 @@ static NSString *const kImage                 = @"keyForImage";
     [config.userContentController addScriptMessageHandler:self name:@"login"];
     
     //h5文档开始加载时执行：  设置token
+//    WKUserScript * tokenScript = [[WKUserScript alloc]
+//                                  initWithSource: @"document.cookie = 'token=TeskCookieValue1';"
+//                                  injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:NO];
+    
     WKUserScript * tokenScript = [[WKUserScript alloc]
-                                  initWithSource: @"document.cookie = 'token=TeskCookieValue1';"
+                                  initWithSource:[NSString stringWithFormat:@"document.cookie = 'token=%@'",@"ssss"]
                                   injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:NO];
+    
     [config.userContentController addUserScript:tokenScript];
 
     // 显示WKWebView
@@ -142,7 +149,7 @@ static NSString *const kImage                 = @"keyForImage";
     
     
     NSURL *path = [[NSBundle mainBundle] URLForResource:@"test" withExtension:@"html"];
-    [self.wkWebView loadRequest:[NSURLRequest requestWithURL:path]];
+    [self.wkWebView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://127.0.0.1/iweb/test.php"]]];
     [self.view addSubview:self.wkWebView];
 
 }
@@ -303,6 +310,7 @@ static NSString *const kImage                 = @"keyForImage";
 // 如果不添加这个，那么wkwebview跳转不了AppStore
 - (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
     
+    
     if ([webView.URL.absoluteString hasPrefix:@"https://itunes.apple.com"]) {
         [[UIApplication sharedApplication] openURL:navigationAction.request.URL];
         decisionHandler(WKNavigationActionPolicyCancel);
@@ -364,6 +372,17 @@ static NSString *const kImage                 = @"keyForImage";
 - (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message {
      NSLog(@"%@----",message.name);
     
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"reloadJSData" object:nil];
+    
+    
+    
+}
+
+- (void)reloadData{
+    
+    [self.wkWebView evaluateJavaScript:@"window.location.reload()" completionHandler:^(id _Nullable response, NSError * _Nullable error) {
+        NSLog(@"%@ %@",response,error);
+    }];
 }
 
 //- (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message {
