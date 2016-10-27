@@ -121,7 +121,7 @@ static NSString *const kImage                 = @"keyForImage";
 //                                  injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:NO];
     
     WKUserScript * tokenScript = [[WKUserScript alloc]
-                                  initWithSource:[NSString stringWithFormat:@"document.cookie = 'token=%@'",@"ssss"]
+                                  initWithSource:[NSString stringWithFormat:@"document.cookie = 'token=%@'",@"i am token"]
                                   injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:NO];
     
     [config.userContentController addUserScript:tokenScript];
